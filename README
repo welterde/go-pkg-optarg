@@ -50,4 +50,8 @@
    -f bar
    -f	"bar"
 
+ - We support chaining shortform options together like this: -mnopq
+   This considers each letter as a separate option. The last one can even have
+   an argument if it needs one: -mnopq "foo"
+   
 
