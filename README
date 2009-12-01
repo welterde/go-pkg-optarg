@@ -25,7 +25,8 @@
    outputs *neatly formatted* text. It prints output like the following. Note
    that this is the Usage() output of the options listed in optarg_test.go. It
    uses my own sexy multilineWrap() routine (see string.go):
-
+ 
+--------------------------------------------------------------------------------
  Usage: ./6.out [options]:
 
  --source, -s: Path to the source folder. Here is some added description
@@ -37,4 +38,16 @@
  --noproc, -n: Skip pre/post processing. (defaults to: false)
   --purge, -p: Clean compiled packages after linking is complete. (defaults to:
                false)
+--------------------------------------------------------------------------------
+
+ - Specify arguments to options using whitespace.
  
+   This is *not* accepted:
+   -f=bar
+   -fBar
+  
+   This *is* accepted:
+   -f bar
+   -f	"bar"
+
+
