@@ -1,44 +1,23 @@
 /*
+Copyright (c) 2009-2010 Jim Teeuwen.
 
- author: jim teeuwen <jimteeuwen@gmail.com>
- version: 0.1
+This software is provided 'as-is', without any express or implied
+warranty. In no event will the authors be held liable for any damages
+arising from the use of this software.
 
- OPTARG - A simple commandline options parser.
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
 
- - Allows options with single and multi character names according to the
-   traditional unix way of doing things. eg:  -o versus --option
- - Exposes a channel based iterator which returns parsed options from the
-   optarg.Parse() function. Note that it only yields Options which are actually
-   present in the commandline arguments (os.Args). Call as a for loop:
+    1. The origin of this software must not be misrepresented; you must not
+    claim that you wrote the original software. If you use this software
+    in a product, an acknowledgment in the product documentation would be
+    appreciated but is not required.
 
-   for opt := range optarg.Parse() {
-   	// ... parse option
-   }
+    2. Altered source versions must be plainly marked as such, and must not be
+    misrepresented as being the original software.
 
- - Standard switch tokens are - and --. Can be modified by changing the vars
-   optarg.ShortSwitch and optarg.LongSwitch.
- - Any arguments not associated with an option will be available in the
-   optarg.Remainder slice after optarg.Parse() has been run.
- - Boolean flags require no value. The precense or absence of the flag is the
-   value by itself. eg: flag '-n' is false if it's not found in os.Args, true if
-   it is.
- - Exposes a Usage() function which prints options with their description and
-   default values to the standard output. As opposed to the flag package, this
-   outputs *neatly formatted* text. It prints output like the following. Note
-   that this is the Usage() output of the options listed in optarg_test.go. It
-   uses my own sexy multilineWrap() routine (see string.go):
-
- Usage: ./6.out [options]:
-
- --source, -s: Path to the source folder. Here is some added description
-               information which is completely useless, but it makes sure we can
-               pimp our sexy Usage() output when dealing with lenghty, multi
-               -line description texts.
-    --bin, -b: Path to the binary folder.
-   --arch, -a: Target architecture. (defaults to: amd64)
- --noproc, -n: Skip pre/post processing. (defaults to: false)
-  --purge, -p: Clean compiled packages after linking is complete. (defaults to:
-               false)
+    3. This notice may not be removed or altered from any source distribution.
 
 */
 package optarg
@@ -62,7 +41,7 @@ var (
 	Remainder   = make([]string, 0)
 	ShortSwitch = "-"
 	LongSwitch  = "--"
-	appname     = os.Args[0]
+	UsageInfo   = fmt.Sprintf("Usage: %s [options]:", os.Args[0])
 )
 
 // Prints usage information in a neatly formatted overview.
@@ -80,7 +59,7 @@ func Usage() {
 
 	offset++ // add margin.
 
-	fmt.Printf("Usage: %s [options]:\n\n", appname)
+	fmt.Printf("%s\n\n", UsageInfo)
 
 	for _, v := range options {
 		// Print namelist. right-align it based on the maximum width
@@ -221,54 +200,45 @@ func findOption(name string) *Option {
 func (this *Option) String() string { return this.value }
 
 func (this *Option) Bool() bool {
-	yes := []string{"1", "y", "yes", "true", "on"}
-	this.value = strings.ToLower(this.value)
-	for _, v := range yes {
-		if v == this.value {
-			return true
-		}
+	if b, err := strconv.Atob(this.value); err == nil {
+		return b
 	}
 	return false
 }
 
 func (this *Option) Int() int {
-	v, err := strconv.Atoi(this.value)
-	if err != nil {
-		return this.defaultval.(int)
+	if v, err := strconv.Atoi(this.value); err == nil {
+		return v
 	}
-	return v
+	return this.defaultval.(int)
 }
 
 func (this *Option) Int64() int64 {
-	v, err := strconv.Atoi64(this.value)
-	if err != nil {
-		return this.defaultval.(int64)
+	if v, err := strconv.Atoi64(this.value); err == nil {
+		return v
 	}
-	return v
+	return this.defaultval.(int64)
 }
 
 func (this *Option) Float() float {
-	v, err := strconv.Atof(this.value)
-	if err != nil {
-		return this.defaultval.(float)
+	if v, err := strconv.Atof(this.value); err == nil {
+		return v
 	}
-	return v
+	return this.defaultval.(float)
 }
 
 func (this *Option) Float32() float32 {
-	v, err := strconv.Atof32(this.value)
-	if err != nil {
-		return this.defaultval.(float32)
+	if v, err := strconv.Atof32(this.value); err == nil {
+		return v
 	}
-	return v
+	return this.defaultval.(float32)
 }
 
 func (this *Option) Float64() float64 {
-	v, err := strconv.Atof64(this.value)
-	if err != nil {
-		return this.defaultval.(float64)
+	if v, err := strconv.Atof64(this.value); err == nil {
+		return v
 	}
-	return v
+	return this.defaultval.(float64)
 }
 
 func listAppend(list *[]string, item string) {

@@ -1,3 +1,25 @@
+/*
+Copyright (c) 2009-2010 Jim Teeuwen.
+
+This software is provided 'as-is', without any express or implied
+warranty. In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+    1. The origin of this software must not be misrepresented; you must not
+    claim that you wrote the original software. If you use this software
+    in a product, an acknowledgment in the product documentation would be
+    appreciated but is not required.
+
+    2. Altered source versions must be plainly marked as such, and must not be
+    misrepresented as being the original software.
+
+    3. This notice may not be removed or altered from any source distribution.
+
+*/
 package optarg
 
 import "strings"
@@ -20,6 +42,8 @@ func multilineWrap(text string, linesize, leftmargin, rightmargin, alignment int
 	for n := 0; n < leftmargin; n++ {
 		pad += " "
 	}
+
+	linesize--
 
 	if linesize < 1 {
 		linesize = 80
@@ -55,35 +79,41 @@ func multilineWrap(text string, linesize, leftmargin, rightmargin, alignment int
 	return lines
 }
 
-func align(v, pad string, linesize, size, alignment int) (line string) {
+func align(v, pad string, linesize, size, alignment int) string {
+	var data []byte
+	buf := bytes.NewBuffer(data)
+
 	switch alignment {
 	case ALIGN_LEFT:
-		line = pad + v
+		buf.WriteString(pad)
+		buf.WriteString(v)
 
 	case ALIGN_RIGHT:
 		diff := linesize - len(v) - len(pad)
 		for n := 0; n < diff; n++ {
-			line += " "
+			buf.WriteByte(' ')
 		}
-		line += v
+		buf.WriteString(v)
 
 	case ALIGN_CENTER:
 		diff := (size - len(v)) / 2
-		line = pad
+		buf.WriteString(pad)
 		for n := 0; n < diff; n++ {
-			line += " "
+			buf.WriteByte(' ')
 		}
-		line += v
+		buf.WriteString(v)
 
 	case ALIGN_JUSTIFY:
 		if strings.Index(v, " ") == -1 {
-			line = pad + v
-			return
+			buf.WriteString(pad)
+			buf.WriteString(v)
+			return buf.String()
 		}
 
 		diff := size - len(v)
 		if diff == 0 {
-			line = pad + v
+			buf.WriteString(pad)
+			buf.WriteString(v)
 			break
 		}
 
@@ -107,9 +137,11 @@ func align(v, pad string, linesize, size, alignment int) (line string) {
 			}
 		}
 
-		line = pad + v
+		buf.WriteString(pad)
+		buf.WriteString(v)
 	}
-	return
+
+	return buf.String()
 }
 
 // Resizes @list by 1 and assigns @item to the new slot.
@@ -128,7 +160,7 @@ func replaceSingle(h, n, r string) (ret string) {
 }
 
 /*
-	ReplaceAll() replaces all non-overlapping occurrences of @n in @h with @r 
+	ReplaceAll() replaces all non-overlapping occurrences of @n in @h with @r
 	and returns the resulting string.
 */
 func replaceAll(h, n, r string) (ret string) {
