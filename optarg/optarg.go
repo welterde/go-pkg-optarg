@@ -212,12 +212,30 @@ func (this *Option) Int() int {
 	}
 	return this.defaultval.(int)
 }
-
+func (this *Option) Int8() int8 { return int8(this.Int()) }
+func (this *Option) Int16() int16 { return int16(this.Int()) }
+func (this *Option) Int32() int32 { return int32(this.Int()) }
 func (this *Option) Int64() int64 {
 	if v, err := strconv.Atoi64(this.value); err == nil {
 		return v
 	}
 	return this.defaultval.(int64)
+}
+
+func (this *Option) Uint() uint {
+	if v, err := strconv.Atoui(this.value); err == nil {
+		return v
+	}
+	return this.defaultval.(uint)
+}
+func (this *Option) Uint8() uint8 { return uint8(this.Int()) }
+func (this *Option) Uint16() uint16 { return uint16(this.Int()) }
+func (this *Option) Uint32() uint32 { return uint32(this.Int()) }
+func (this *Option) Uint64() uint64 {
+	if v, err := strconv.Atoui64(this.value); err == nil {
+		return v
+	}
+	return this.defaultval.(uint64)
 }
 
 func (this *Option) Float() float {
